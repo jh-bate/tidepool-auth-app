@@ -4,13 +4,17 @@ import { AUTH_CONFIG } from './auth0Config';
 export default class AuthService {
   constructor() {
     // Configure Auth
-
     this.lock = new Auth0Lock(
-      AUTH_CONFIG.domain,
       AUTH_CONFIG.clientId,
+      AUTH_CONFIG.domain,
       {
-        responseType: 'token id_token',
-        scope: 'profile read:data'
+        auth: {
+          redirectUrl: 'http://localhost:3007',
+          responseType: 'code',
+          params: {
+            scope: 'profile read:data'
+          },
+        }
       }
     );
     // Add callback for lock `authenticated` event
@@ -20,6 +24,7 @@ export default class AuthService {
   }
 
   _doAuthentication(authResult){
+    console.log('authResult: ', authResult);
     this.setTokens(
       authResult.idToken, 
       authResult.accessToken,
@@ -29,11 +34,16 @@ export default class AuthService {
   getLock() {
     // An instance of Lock
     return new Auth0Lock(
-      AUTH_CONFIG.domain,
       AUTH_CONFIG.clientId,
+      AUTH_CONFIG.domain,
       {
-        responseType: 'token id_token',
-        scope: 'profile read:data'
+        auth: {
+          redirectUrl: 'http://localhost:3007',
+          responseType: 'code',
+          params: {
+            scope: 'profile read:data'
+          },
+        }
       }
     );
   }

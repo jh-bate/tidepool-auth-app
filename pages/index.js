@@ -32,7 +32,7 @@ export default class extends React.Component {
     const data = this.state.loggedIn ? <div>{<DeviceData accessToken={this.state.accessToken} userID='423b3dcf31'/>}</div> : <div>Please login to get data</div>;
 
     return (
-      <div>
+      <div className='app'>
       <div className='header'>
         <script src="https://cdn.auth0.com/js/lock/10.5/lock.min.js"></script>
         { loginButton }
@@ -42,9 +42,11 @@ export default class extends React.Component {
         { data }
       </div>
       <style jsx>{`
+        .app {
+          text-align: center;
+        }
         .header {
           font: 15px Monaco;
-          text-align: center;
         }
         table {
           font-family: Arial;
