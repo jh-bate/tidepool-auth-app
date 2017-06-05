@@ -4,10 +4,7 @@ import { AUTH_CONFIG } from './auth0Config';
 
 export default class AuthService {
   constructor() {
-    // Configure Auth
     this.lock = this.getLock();
-    // Add callback for lock `authenticated` event
-    // binds login functions to keep this context
     this.handleAuthentication = this.handleAuthentication.bind(this);
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
@@ -41,7 +38,8 @@ export default class AuthService {
       redirectUri: AUTH_CONFIG.redirectUri,
       audience: AUTH_CONFIG.audience,
       responseType: AUTH_CONFIG.responseType,
-      scope: AUTH_CONFIG.scope
+      scope: AUTH_CONFIG.scope 
+      //TODO:add state also see https://auth0.com/docs/libraries/auth0js/v8#webauth-authorize-
     });
   }
 
@@ -51,7 +49,6 @@ export default class AuthService {
 
   loggedIn(){
     let expiresAt = JSON.parse(localStorage.getItem('expires_at'));
-    console.log('logged in?? ',new Date().getTime() < expiresAt);
     return new Date().getTime() < expiresAt;
   }
 
