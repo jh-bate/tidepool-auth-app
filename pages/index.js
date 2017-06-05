@@ -1,7 +1,9 @@
 import React from 'react'
-import Link from 'next/link'
+import Router from 'next/router'
 import AuthService from '../utils/AuthService'
 import DeviceData from '../components/DeviceData'
+import Profile from '../components/Profile'
+import Settings from '../components/Settings'
 
 export default class extends React.Component {
   
@@ -16,26 +18,63 @@ export default class extends React.Component {
       loggedIn: this.auth.loggedIn(),
       accessToken: this.auth.getAccessToken(),
      })
-    // instance of Lock
-    this.lock = this.auth.getLock();
-    this.lock.on('authenticated', () => {
-      this.setState({ loggedIn: this.auth.loggedIn() })
-    });
   }
 
   login() {
     this.auth.login();
   }
 
-  render () {
-    const loginButton = this.state.loggedIn ? <div>HELLO</div> : <button onClick={this.login.bind(this)}>Login</button>;
-    const data = this.state.loggedIn ? <div>{<DeviceData accessToken={this.state.accessToken} userID='423b3dcf31'/>}</div> : <div>Please login to get data</div>;
+  logout() {
+    this.auth.logout();
+    Router.reload('/');
+  }
 
+  settings() {
+    if (this.state.loggedIn) {
+      return (
+        <div><Settings /></div>
+      );
+    }
+  }
+
+  profile() {
+    if (this.state.loggedIn) {
+      return (
+        <div><Profile /></div>
+      );
+    }
+  }
+
+  userData() {
+    if (this.state.loggedIn) {
+      return (
+        <div><DeviceData userID="423b3dcf31"  accessToken={this.auth.getAccessToken()} /></div>
+      );
+    }
+  }
+
+  loginState() {
+    if (this.state.loggedIn) {
+      return (
+        <button onClick={this.logout.bind(this)}>Logout</button>
+      );
+    }
+    return <button onClick={this.login.bind(this)}>Login</button>
+  }
+
+  render () {
+   let data = <div>Please login</div>;
+    if (this.state.loggedIn) {
+      data = <div>
+        {this.profile()}
+        {this.settings()} 
+        {this.userData()}
+      </div>;
+    }
     return (
       <div className='app'>
       <div className='header'>
-        <script src="https://cdn.auth0.com/js/lock/10.5/lock.min.js"></script>
-        { loginButton }
+        { this.loginState() }
         <h3> TIDEPOOL AUTH APP </h3>
       </div>
       <div>
@@ -61,6 +100,13 @@ export default class extends React.Component {
           padding: 12px 35px;
           border-collapse: collapse;
         }
+        hr {
+          height: 1px;
+          border: 0;
+          color: #333;
+          background-color: #333;
+          width: 60%;
+        } 
       `}</style>
       </div>
     )

@@ -22,23 +22,31 @@ export default class DeviceData extends React.Component {
     console.log('Authorization: ', authStr);
     return axios.get(url, { headers: { Authorization: authStr }})
       .then((response) => {
-        this.setState({ data: data.results });
+        this.setState({ data: response.data });
       })
       .catch((error) => {
-        console.log('Data call: ',error);
-        this.setState({ error: 'errored getting data' });
+        this.setState({ error: error.message });
       });
   }
 
   render() {
     const deviceData = this.state.data.map((item, i) => {
       return <div>
-        <span>{item}</span>
+        <span>{new Date(item.time).toDateString()}:  {item.type} {item.subType}</span>
       </div>
     });
     return <div id="layout-content" className="layout-content-wrapper">
+      <div className="header">
+        <h3>Device Data</h3>
+        <hr />
+      </div>
       <div className="data-list">{ deviceData }</div>
       <div className="data-error">{ this.state.error }</div>
+      <style jsx>{`
+        .data-error {
+          color: red;
+        }
+      `}</style>
     </div>
   }
 }

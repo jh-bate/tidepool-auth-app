@@ -1,64 +1,58 @@
 import React from 'react'
+import auth0 from 'auth0-js'
 import { AUTH_CONFIG } from './auth0Config';
 
 export default class AuthService {
   constructor() {
     // Configure Auth
-    this.lock = new Auth0Lock(
-      AUTH_CONFIG.clientId,
-      AUTH_CONFIG.domain,
-      {
-        auth: {
-          redirectUrl: 'http://localhost:3007',
-          responseType: 'code',
-          params: {
-            scope: 'profile read:data'
-          },
-        }
-      }
-    );
+    this.lock = this.getLock();
     // Add callback for lock `authenticated` event
-    this.lock.on('authenticated', this._doAuthentication.bind(this));
     // binds login functions to keep this context
+    this.handleAuthentication = this.handleAuthentication.bind(this);
     this.login = this.login.bind(this);
+    this.logout = this.logout.bind(this);
   }
 
-  _doAuthentication(authResult){
-    console.log('authResult: ', authResult);
-    this.setTokens(
-      authResult.idToken, 
-      authResult.accessToken,
-    );
+  handleAuthentication() {
+    this.lock.parseHash((err, authResult) => {
+      console.log('authResult: ',authResult);
+      if (authResult && authResult.accessToken && authResult.idToken) {
+        this.setSession(authResult);
+      } else if (err) {
+        console.log(err);
+      }
+    });
+  }
+
+  setSession(authResult) {
+    if (authResult && authResult.accessToken && authResult.idToken) {
+      let expiresAt = JSON.stringify((authResult.expiresIn * 1000) + new Date().getTime());
+      localStorage.setItem('access_token', authResult.accessToken);
+      localStorage.setItem('id_token', authResult.idToken);
+      localStorage.setItem('expires_at', expiresAt);
+    }
   }
 
   getLock() {
     // An instance of Lock
-    return new Auth0Lock(
-      AUTH_CONFIG.clientId,
-      AUTH_CONFIG.domain,
-      {
-        auth: {
-          redirectUrl: 'http://localhost:3007',
-          responseType: 'code',
-          params: {
-            scope: 'profile read:data'
-          },
-        }
-      }
-    );
+    return new auth0.WebAuth({
+      domain: AUTH_CONFIG.domain,
+      clientID: AUTH_CONFIG.clientId,
+      redirectUri: AUTH_CONFIG.redirectUri,
+      audience: AUTH_CONFIG.audience,
+      responseType: AUTH_CONFIG.responseType,
+      scope: AUTH_CONFIG.scope
+    });
   }
 
   login() {
-    this.lock.show();
+    this.lock.authorize();
   }
 
   loggedIn(){
-    return !!this.getIDToken();
-  }
-
-  setTokens(idToken, accessToken){
-    localStorage.setItem('id_token', idToken);
-    localStorage.setItem('access_token', accessToken);
+    let expiresAt = JSON.parse(localStorage.getItem('expires_at'));
+    console.log('logged in?? ',new Date().getTime() < expiresAt);
+    return new Date().getTime() < expiresAt;
   }
 
   getIDToken(){
@@ -72,5 +66,6 @@ export default class AuthService {
   logout(){
     localStorage.removeItem('id_token');
     localStorage.removeItem('access_token');
+    localStorage.removeItem('expires_at');
   }
 }
