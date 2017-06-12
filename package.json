@@ -8,11 +8,14 @@
   "dependencies": {
     "auth0-js": "^8.7.0",
     "axios": "^0.16.1",
+    "express": "^4.15.3",
     "next": "^2.4.0",
+    "path": "^0.12.7",
     "react": "^15.5.4",
     "react-dom": "^15.5.4"
   },
   "scripts": {
-    "dev": "next"
+    "dev": "node server.js",
+    "start": "NODE_ENV=production node server.js"
   }
 }
