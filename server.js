@@ -15,6 +15,7 @@ app.prepare().then(() => {
 
   redirects.forEach(({ from, to, type = 301, method = 'get' }) => {
     server[method](from, (req, res) => {
+      console.log('redirect: ', to)
       res.redirect(type, to)
     })
   })

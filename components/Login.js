@@ -2,6 +2,7 @@ import React from 'react'
 import auth0 from 'auth0-js'
 
 import { AUTH_CONFIG } from '../utils/auth0Config'
+import AuthService from '../utils/AuthService'
 
 export default class Login extends React.Component {
     static propTypes = {
@@ -14,32 +15,36 @@ export default class Login extends React.Component {
     }
 
     componentDidMount () {
+        this.authService = new AuthService();
         this.auth = new auth0.WebAuth({
-            domain: 'tidepool.auth0.com',
-            clientID: AUTH_CONFIG.clientId, //this.props.authConfig.clientID,
-            redirectUri: AUTH_CONFIG.redirectUri //this.props.authConfig.redirectUri 
+            domain: AUTH_CONFIG.domain,
+            clientID: AUTH_CONFIG.clientId,
+            redirectUri: AUTH_CONFIG.redirectUri 
         });
     }
 
     handleLogin(event) {
         const target = event.target;
         event.preventDefault();
-        // this.auth.client.login({
-        //     realm: 'Username-Password-Authentication',
-        //     username: target.username.value,
-        //     password: target.password.value,
-        //     scope: this.props.authConfig.scope,
-        //     audience: this.props.authConfig.audience
-        // });
-
         this.auth.redirect.loginWithCredentials({
-            //connection: 'Username-Password-Authentication',
             connection: 'tidepool-platform',
             username: target.username.value,
             password: target.password.value,
             scope: this.props.authConfig.scope,
+            audience: this.props.authConfig.audience,
             responseType: this.props.authConfig.responseType
         });
+
+        // this.auth.client.login({
+        //     realm: 'tidepool-platform',
+        //     username: target.username.value,
+        //     password: target.password.value,
+        //     scope: this.props.authConfig.scope,
+        //     audience: this.props.authConfig.audience
+        // }, function(err, authResult) {
+        //     console.log('error: ', err);
+        //     console.log('authResult: ', authResult);
+        // });
 
     }
 
