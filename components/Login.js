@@ -18,8 +18,7 @@ export default class Login extends React.Component {
         this.authService = new AuthService();
         this.auth = new auth0.WebAuth({
             domain: AUTH_CONFIG.domain,
-            clientID: AUTH_CONFIG.clientId,
-            redirectUri: AUTH_CONFIG.redirectUri 
+            clientID: this.props.authConfig.clientID
         });
     }
 
@@ -32,20 +31,9 @@ export default class Login extends React.Component {
             password: target.password.value,
             scope: this.props.authConfig.scope,
             audience: this.props.authConfig.audience,
-            responseType: this.props.authConfig.responseType
+            responseType: this.props.authConfig.responseType,
+            redirectUri: this.props.authConfig.redirectUri 
         });
-
-        // this.auth.client.login({
-        //     realm: 'tidepool-platform',
-        //     username: target.username.value,
-        //     password: target.password.value,
-        //     scope: this.props.authConfig.scope,
-        //     audience: this.props.authConfig.audience
-        // }, function(err, authResult) {
-        //     console.log('error: ', err);
-        //     console.log('authResult: ', authResult);
-        // });
-
     }
 
     render() {
